@@ -33,15 +33,14 @@ def train_model(
     num_epochs=30,
     learning_rate=1e-2,
     target_index=0,  # 0=dipole, 4=homo-lumo gap
+    gamma=0.999
 ):
     opt = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    scheduler = torch.optim.lr_scheduler.ExponentialLR(opt, gamma=0.999)
+    scheduler = torch.optim.lr_scheduler.ExponentialLR(opt, gamma=gamma)
     loader_train = DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True
     )
-    loader_val = DataLoader(
-        val_dataset, batch_size=len(val_dataset), shuffle=True
-    )  # Just a single batch...
+    loader_val = DataLoader(val_dataset, batch_size=len(val_dataset), shuffle=True)  # Just a single batch...
     # batch_to_device = ToDevice(device)
     # batch_to_device = ToDevice(device, ["edge_index", "pos", "z", "batch", "y"])
 
@@ -65,7 +64,8 @@ def train_model(
             scheduler.step()
             epoch_train_loss += loss.item()
 
-        train_loss.append(epoch_train_loss / len(loader_train))
+        epoch_train_loss_mean = epoch_train_loss / len(loader_train)
+        train_loss.append(epoch_train_loss_mean)
 
         with torch.no_grad():
             for batch in loader_val:
@@ -76,7 +76,8 @@ def train_model(
 
         val_loss.append(epoch_val_loss)
 
-        torch.save(model.state_dict(), f'saved_weights/{epoch}_weights.pt')
+        # Save every epoch
+        # torch.save(model.state_dict(), f'saved_weights/{epoch}_weights.pt')
 
         # Check if best validation loss and if so save to `BEST.pt`
         if epoch_val_loss <= min(val_loss):
@@ -87,7 +88,7 @@ def train_model(
         print(text_progress_bar(float((epoch + 1) / num_epochs)), end="\r", flush=True)
         toc = time.time()
 
-        summary(epoch_train_loss, epoch_val_loss, epoch, toc-tic)
+        summary(epoch_train_loss_mean, epoch_val_loss, epoch, toc-tic)
 
 
     print("\n")

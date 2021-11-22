@@ -2,17 +2,14 @@ import torch
 from torch import nn
 from torch_geometric.loader import DataLoader
 
+
 def evaluate(
         model,
         test_dataset,
         target_index,
 ):
-    loader_test = DataLoader(
-        test_dataset, batch_size=len(test_dataset), shuffle=True
-    )
-
+    loader_test = DataLoader(test_dataset, batch_size=len(test_dataset))
     loss_fn = nn.MSELoss()
-
 
     with torch.no_grad():
         for batch in loader_test:
@@ -21,5 +18,7 @@ def evaluate(
             loss = loss_fn(pred.flatten(), batch.y[:, target_index].flatten())
             test_loss = loss.item()
 
-    print (f'Test set loss: {test_loss:.2f}')
+    print ("------------------------------------------------")
+    print(f'Test set loss: {test_loss:.2f}')
+    print("------------------------------------------------")
     return test_loss

@@ -4,7 +4,6 @@
 
 from setuptools import setup
 import glob
-import os
 
 setup(
     author="HW,SH,MM",

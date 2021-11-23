@@ -3,7 +3,7 @@ from torch_geometric.datasets import QM9
 
 def load_dataset(dataset_path, dataset_size_lim):
     dataset = QM9(root=dataset_path)
-    dataset.shuffle()
+    dataset = dataset.shuffle()
 
     if dataset_size_lim is None:
         dataset_size_lim = len(dataset)
@@ -14,7 +14,9 @@ def load_dataset(dataset_path, dataset_size_lim):
     test_size = int(dataset_size_lim * 0.1)
     train_dataset = dataset[:train_size]
     val_dataset = dataset[train_size: train_size + val_size]
-    test_dataset = dataset[train_size + val_size: train_size + val_size + test_size]
+    test_dataset = dataset[
+        train_size + val_size: train_size + val_size + test_size
+    ]
 
     print(f"Size of training set: {len(train_dataset)}")
     print(f"Size of val set: {len(val_dataset)}")

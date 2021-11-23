@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from torch_geometric.loader import DataLoader
 import os
-# from torch_geometric.transforms import ToDevice
+from torch_geometric.transforms import ToDevice
 import time
 
 def text_progress_bar(fraction):
@@ -26,7 +26,7 @@ def summary(epoch_train_loss, epoch_val_loss, epoch, epoch_time):
 
 def train_model(
     model,
-    # device,
+    device,
     train_dataset,
     val_dataset,
     batch_size=64,
@@ -42,7 +42,7 @@ def train_model(
     )
     loader_val = DataLoader(val_dataset, batch_size=len(val_dataset), shuffle=True)  # Just a single batch...
     # batch_to_device = ToDevice(device)
-    # batch_to_device = ToDevice(device, ["edge_index", "pos", "z", "batch", "y"])
+    batch_to_device = ToDevice(device, ["edge_index", "pos", "z", "batch", "y"])
 
     make_weights_dir()
     tic = time.time()
@@ -54,9 +54,8 @@ def train_model(
         tic = time.time()
         epoch_train_loss = 0
         for batch in loader_train:
-            # batch = batch_to_device(batch)
+            batch = batch_to_device(batch)
             pred = model(batch)
-            #             print(pred)
             loss = loss_fn(pred.flatten(), batch.y[:, target_index].flatten())
             opt.zero_grad()
             loss.backward()
@@ -69,7 +68,7 @@ def train_model(
 
         with torch.no_grad():
             for batch in loader_val:
-                # batch = batch_to_device(batch)
+                batch = batch_to_device(batch)
                 pred = model(batch)
                 loss = loss_fn(pred.flatten(), batch.y[:, target_index].flatten())
                 epoch_val_loss = loss.item()

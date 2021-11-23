@@ -1,13 +1,17 @@
 from torch_geometric.datasets import QM9
 
 
-def load_dataset(dataset_size):
-    dataset = QM9(root='./QM9')
+def load_dataset(dataset_path, dataset_size_lim):
+    dataset = QM9(root=dataset_path)
     dataset.shuffle()
-    dataset = dataset[:dataset_size]
-    train_size = int(dataset_size * 0.8)
-    val_size = int(dataset_size * 0.1)
-    test_size = int(dataset_size * 0.1)
+
+    if dataset_size_lim is None:
+        dataset_size_lim = len(dataset)
+
+    dataset = dataset[:dataset_size_lim]
+    train_size = int(dataset_size_lim * 0.8)
+    val_size = int(dataset_size_lim * 0.1)
+    test_size = int(dataset_size_lim * 0.1)
     train_dataset = dataset[:train_size]
     val_dataset = dataset[train_size: train_size + val_size]
     test_dataset = dataset[train_size + val_size: train_size + val_size + test_size]

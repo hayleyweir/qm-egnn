@@ -1,0 +1,5 @@
+            # layers |  hidden dim |    Batch size 
+Model 1:    7           128             100
+Model 2:    3           128             100
+Model 3:    7           64              100
+Model 4:    7           128             50

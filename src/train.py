@@ -5,6 +5,7 @@ import os
 from torch_geometric.transforms import ToDevice
 import time
 
+
 def text_progress_bar(fraction):
     nchars = 50
     nfilled = int(nchars * fraction)
@@ -16,12 +17,31 @@ def text_progress_bar(fraction):
         + f"{int(100*fraction):3d}%"
     )
 
+
 def make_weights_dir():
     if not os.path.isdir("saved_weights"):
         os.mkdir("saved_weights")
 
+
 def summary(epoch_train_loss, epoch_val_loss, epoch, epoch_time):
     print (f'Epoch {epoch}: \t Training loss {epoch_train_loss:.3f} \t Val loss {epoch_val_loss:.3f} \t Time for epoch: {epoch_time/60.:.3f} min', flush=True)
+
+
+class Logger():
+    def __init__(self, filename, keys):
+        self.filename = filename
+        assert(isinstance(keys, list))
+        self.n_keys = len(keys)
+
+        self.log_string = "{:>5d}" + self.n_keys * "  {:.4e}" + "\n"
+
+        with open(filename, "a") as fp:
+            fp.write("epoch," + ",".join(keys) + "\n")
+
+    def log(self, epoch, values):
+        values = tuple(values)
+        with open(self.filename, "a") as fp:
+            fp.write(self.log_string.format(epoch, *values))
 
 
 def train_model(
@@ -44,6 +64,7 @@ def train_model(
     # batch_to_device = ToDevice(device)
     batch_to_device = ToDevice(device, ["edge_index", "pos", "z", "batch", "y"])
 
+    logger = Logger("history.txt", ["train_loss", "val_loss"])
     make_weights_dir()
     tic = time.time()
 
@@ -80,15 +101,15 @@ def train_model(
 
         # Check if best validation loss and if so save to `BEST.pt`
         if epoch_val_loss <= min(val_loss):
-            print (f' - BEST SCORE, SAVING WEIGHTS to `BEST.pt`')
+            print(f' - BEST SCORE, SAVING WEIGHTS to `BEST.pt`')
             torch.save(model.state_dict(), f'saved_weights/BEST.pt')
+            torch.save(model.state_dict(), f"saved_weights/weights_{epoch:0>4d}_{epoch_val_loss:.4e}.pt")
 
-
-        print(text_progress_bar(float((epoch + 1) / num_epochs)), end="\r", flush=True)
+        #print(text_progress_bar(float((epoch + 1) / num_epochs)), end="\r", flush=True)
         toc = time.time()
 
+        logger.log(epoch, [epoch_train_loss_mean, epoch_val_loss])
         summary(epoch_train_loss_mean, epoch_val_loss, epoch, toc-tic)
-
 
     print("\n")
 

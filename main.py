@@ -52,7 +52,7 @@ def parse_args():
         "--gamma",
         type=float,
         default=0.999,
-        help="Default: 0.99"
+        help="Default: 0.999"
     )
     parser.add_argument(
         "-u",

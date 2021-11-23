@@ -21,7 +21,7 @@ def make_weights_dir():
         os.mkdir("saved_weights")
 
 def summary(epoch_train_loss, epoch_val_loss, epoch, epoch_time):
-    print (f'Epoch {epoch}: \t Training loss {epoch_train_loss:.3f} \t Val loss {epoch_val_loss:.3f} \t Time for epoch: {epoch_time/60.:.3f} min')
+    print (f'Epoch {epoch}: \t Training loss {epoch_train_loss:.3f} \t Val loss {epoch_val_loss:.3f} \t Time for epoch: {epoch_time/60.:.3f} min', flush=True)
 
 
 def train_model(

@@ -13,5 +13,5 @@ setup(
     description="Run qm_egnn",
     name="qm_egnn",
     packages=["src"],
-    scripts=["main.py"]
+    scripts=["main.py"] + glob.glob("scripts/*.py")
 )

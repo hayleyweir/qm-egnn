@@ -104,12 +104,18 @@ def train_model(
             print(f' - BEST SCORE, SAVING WEIGHTS to `BEST.pt`')
             torch.save(model.state_dict(), f'saved_weights/BEST.pt')
             torch.save(model.state_dict(), f"saved_weights/weights_{epoch:0>4d}_{epoch_val_loss:.4e}.pt")
+            best_epoch = epoch
 
         #print(text_progress_bar(float((epoch + 1) / num_epochs)), end="\r", flush=True)
         toc = time.time()
 
         logger.log(epoch, [epoch_train_loss_mean, epoch_val_loss])
         summary(epoch_train_loss_mean, epoch_val_loss, epoch, toc-tic)
+
+        # Check for early stopping
+        n_since_best = epoch - best_epoch
+        if n_since_best > 5:
+            break
 
     print("\n")
 

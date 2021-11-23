@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 from torch_geometric.loader import DataLoader
+from torch_geometric.transforms import ToDevice
 
 
 def evaluate(

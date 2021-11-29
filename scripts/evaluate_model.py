@@ -66,6 +66,9 @@ def main():
     model = EGNN_network(
         hidden_units=args["hidden_units"], n_layers=args["n_layers"]
     )
+    model.load_state_dict(torch.load(args["weights_path"]))
+    print(f"Loaded weights: {args['weights_path']}")
+
     n_parameters = sum(
         [tensor.flatten().size()[0] for tensor in model.parameters()]
     )
@@ -90,34 +93,6 @@ def main():
 
     # 5. Print the eval_dict to text files
     eval.dump_eval_dict(args["output_dir"], eval_dict)
-
-    # 6. Plot the predictions vs target
-    colors = ["blue", "green", "red"]
-    fontsize = 20
-    plt.figure(figsize=(20, 10))
-    for i, (dataset_key, data_dict) in enumerate(eval_dict.items()):
-        color = colors[i]
-        plt.subplot(1, 3, i + 1)
-        plt.scatter(
-            data_dict["target"],
-            data_dict["prediction"],
-            c=color,
-            label=dataset_key,
-            s=2,
-        )
-        plt.xlabel("Target", fontsize=fontsize)
-        plt.ylabel("Prediction", fontsize=fontsize)
-        plt.axis("square")
-        plt.title(dataset_key, fontsize=fontsize)
-
-
-    # # 7. Print some metrics
-    # with open(os.path.join(args["output_dir"], "metrics.txt"), "w") as fp:
-    #     fp.write("Metric, " + ", ".join(list(eval_dict.keys())))
-
-    #     # MAE
-
-
 
 
 if __name__ == "__main__":
